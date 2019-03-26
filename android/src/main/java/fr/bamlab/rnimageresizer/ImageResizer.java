@@ -21,7 +21,7 @@ import java.util.Date;
 /**
  * Provide methods to resize and rotate an image file.
  */
-public class ImageResizer {
+class ImageResizer {
     private final static String IMAGE_JPEG = "image/jpeg";
     private final static String IMAGE_PNG = "image/png";
     private final static String SCHEME_DATA = "data";
@@ -40,16 +40,25 @@ public class ImageResizer {
         if (maxHeight > 0 && maxWidth > 0) {
             float width = image.getWidth();
             float height = image.getHeight();
+            if (width > height) {
+                if (maxWidth < maxHeight) {
+                    int temp = maxWidth;
+                    maxWidth = maxHeight;
+                    maxHeight = temp;
+                } 
+            } else {
+                if (maxHeight < maxWidth) {
+                    int temp = maxWidth;
+                    maxWidth = maxHeight;
+                    maxHeight = temp;
+                }
+            }
 
             float ratio = Math.min((float)maxWidth / width, (float)maxHeight / height);
 
             int finalWidth = (int) (width * ratio);
             int finalHeight = (int) (height * ratio);
-            try {
-                newImage = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
-            } catch (OutOfMemoryError e) {
-                return null;
-            }
+            newImage = Bitmap.createScaledBitmap(image, finalWidth, finalHeight, true);
         }
 
         return newImage;
@@ -64,11 +73,7 @@ public class ImageResizer {
 
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
-        try {
-            retVal = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-        } catch (OutOfMemoryError e) {
-            return null;
-        }
+        retVal = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
         return retVal;
     }
 
